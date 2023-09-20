@@ -4,3 +4,9 @@
 [submodule "pdf-parser-front-end"]
 	path = pdf-parser-front-end
 	url = git@github.com:mnsavage/pdf-parser-front-end.git
+[submodule "pdf_parser_back_end"]
+	path = pdf_parser_back_end
+	url = git@github.com:mnsavage/pdf_parser_back_end.git
+[submodule "pdf_parser_front_end"]
+	path = pdf_parser_front_end
+	url = git@github.com:mnsavage/pdf_parser_front_end.git
