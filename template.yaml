@@ -10,6 +10,25 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false    # Set this to true to block public ACLs
+        BlockPublicPolicy: false  # Set this to true to block public policies
+        IgnorePublicAcls: false   # Set this to true to ignore public ACLs
+        RestrictPublicBuckets: false  # Set this to true to restrict public buckets
+
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Id: PublicReadPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub arn:aws:s3:::${WebsiteBucket}/*
 
   OriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
