@@ -3,6 +3,67 @@ Transform: AWS::Serverless-2016-10-31
 Description: An example SAM template for hosting a React website on S3 with CloudFront.
 
 Resources:
+  PdfParserApi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+              swagger: '2.0'
+              info:
+                title: My API
+              paths: # paths that the api has
+                /upload:
+                  post: # items POST protocol
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: # connect to lambda function resource
+                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostLambdaFunction.Arn}/invocations
+                      responses: {}
+
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: 'YourLambdaRoleName'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+              - 'lambda.amazonaws.com'
+          Action:
+            - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref CloudWatchLogsPolicy
+
+  CloudWatchLogsPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: 'Managed Policy for CloudWatch Logs Access'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: 'arn:aws:logs:*:*:*'
+
+  PDFUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./pdf_parser_back_end/api/upload
+      Handler: post.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Upload:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
 
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -56,8 +117,11 @@ Resources:
               Forward: none
 
 Outputs:
-
   WebsiteURL:
     Description: "URL of the website"
     Value: !GetAtt [CloudFrontDistribution, DomainName]
+  PdfParserApiURL:
+    Description: "API Gateway endpoint URL for Prod environment"
+    Value:
+      Fn::Sub: https://${PdfParserApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload
 
