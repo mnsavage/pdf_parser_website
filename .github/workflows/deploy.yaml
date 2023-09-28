@@ -1,0 +1,42 @@
+name: Deploy to AWS
+
+on:
+  # workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies and build React app
+        run: |
+          npm ci
+          npm run build
+        working-directory: ./pdf_parser_front_end
+
+      - name: Deploy with SAM
+        run: |
+          sam build
+          sam deploy --stack-name $STACK_NAME --guided
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
+
+      - name: Upload build folder to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ env.BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'pdf_parser_front_end/build/'
