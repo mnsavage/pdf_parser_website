@@ -44,10 +44,10 @@ jobs:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
       
       - name: Retrieve S3 Bucket Name
-            run: |
-              BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
-              echo "S3 Bucket Name: $BUCKET_NAME"
-              echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
+          echo "S3 Bucket Name: $BUCKET_NAME"
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
         env:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
