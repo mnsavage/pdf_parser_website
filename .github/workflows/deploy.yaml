@@ -18,7 +18,7 @@ jobs:
         run: |
           npm ci
           npm run build
-        working-directory: ./pdf_parser_front_end
+        working-directory: pdf_parser_front_end/
 
       - name: Deploy with SAM
         run: |
