@@ -60,3 +60,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'pdf_parser_front_end/build/'
+
+      - name: Get Website URL
+        run: |
+          WEBSITE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteURL'].OutputValue" --output text)
+          echo "Website URL: $WEBSITE_URL"
+        env:
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
