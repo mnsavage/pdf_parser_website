@@ -43,11 +43,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
       
-      - name: Retrieve S3 Bucket Name
+      - name: Retrieve Front-End S3 Bucket Name
         run: |
-          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
-          echo "S3 Bucket Name: $BUCKET_NAME"
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+          FRONT_END_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
+          echo "S3 Bucket Name: $FRONT_END_BUCKET_NAME"
+          echo "FRONT_END_BUCKET_NAME=$FRONT_END_BUCKET_NAME" >> $GITHUB_ENV
         env:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
@@ -56,7 +56,7 @@ jobs:
         with:
           args: --delete
         env:
-          AWS_S3_BUCKET: ${{ env.BUCKET_NAME }}
+          AWS_S3_BUCKET: ${{ env.FRONT_END_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'pdf_parser_front_end/build/'
