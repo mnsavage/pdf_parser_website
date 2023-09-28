@@ -1,0 +1,78 @@
+name: Deploy to AWS
+
+on: 
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install dependencies and build React app
+        run: |
+          cd pdf_parser_front_end/
+          npm ci
+          npm run build
+          
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy with SAM
+        run: |
+          sam build
+          sam validate
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name $STACK_NAME \
+            --region us-east-1 \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
+      
+      - name: Retrieve Front-End S3 Bucket Name
+        run: |
+          FRONT_END_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucketName'].OutputValue" --output text)
+          echo "S3 Bucket Name: $FRONT_END_BUCKET_NAME"
+          echo "FRONT_END_BUCKET_NAME=$FRONT_END_BUCKET_NAME" >> $GITHUB_ENV
+        env:
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
+
+      - name: Upload build folder to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ env.FRONT_END_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'pdf_parser_front_end/build/'
+
+      - name: Get Website URL
+        run: |
+          WEBSITE_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='WebsiteURL'].OutputValue" --output text)
+          echo "Website URL: $WEBSITE_URL"
+        env:
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
+
+      - name: Delete AWS Stack on Pull Request
+        if: github.event_name == 'pull_request'
+        run: |
+          aws s3 rm s3://${{ env.FRONT_END_BUCKET_NAME }} --recursive
+          aws cloudformation delete-stack --stack-name $STACK_NAME
+        env:
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
