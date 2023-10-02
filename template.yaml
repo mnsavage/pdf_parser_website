@@ -18,7 +18,7 @@ Resources:
                       httpMethod: POST
                       type: aws_proxy
                       uri: # connect to lambda function resource
-                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostLambdaFunction.Arn}/invocations
+                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PDFUploadFunction.Arn}/invocations
                       responses: {}
 
   LambdaExecutionRole:
