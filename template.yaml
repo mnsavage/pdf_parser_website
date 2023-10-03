@@ -7,6 +7,8 @@ Resources:
     Type: 'AWS::Serverless::Api'
     Properties:
       StageName: Prod
+      BinaryMediaTypes:
+        - 'application~1pdf'
       DefinitionBody:
               swagger: '2.0'
               info:
@@ -54,9 +56,10 @@ Resources:
   PDFUploadFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./pdf_parser_back_end/api/upload
-      Handler: post.lambda_handler
+      CodeUri: ./pdf_parser_back_end/api
+      Handler: upload.post.handler
       Runtime: python3.9
+      Timeout: 300
       Role: !GetAtt LambdaExecutionRole.Arn
       Events:
         Upload:
@@ -120,8 +123,4 @@ Outputs:
   WebsiteURL:
     Description: "URL of the website"
     Value: !GetAtt [CloudFrontDistribution, DomainName]
-  PdfParserApiURL:
-    Description: "API Gateway endpoint URL for Prod environment"
-    Value:
-      Fn::Sub: https://${PdfParserApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload
 
