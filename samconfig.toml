@@ -21,6 +21,7 @@ stack_name = "pdf-parser-website-2c61ab9e-CompanionStack"
 s3_prefix = "pdf-parser-website-2c61ab9e-CompanionStack"
 region = "us-east-1"
 image_repositories = []
+disable_rollback = true
 
 [default.package.parameters]
 resolve_s3 = true
