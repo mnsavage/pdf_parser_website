@@ -15,6 +15,13 @@ Resources:
                 title: My API
               paths: # paths that the api has
                 /upload:
+                  get: # items GET protocol
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: # connect to lambda function resource
+                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PDFRequirementsFunction.Arn}/invocations
+                      responses: {}
                   post: # items POST protocol
                     x-amazon-apigateway-integration:
                       httpMethod: POST
@@ -67,6 +74,21 @@ Resources:
           Properties:
             Path: /upload
             Method: post
+
+  PDFRequirementsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./pdf_parser_back_end/api/upload
+      Handler: get.handler
+      Runtime: python3.9
+      Timeout: 60
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        Upload:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: get
 
   WebsiteBucket:
     Type: AWS::S3::Bucket
