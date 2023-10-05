@@ -74,6 +74,7 @@ Resources:
           Properties:
             Path: /upload
             Method: post
+            RestApiId: !Ref PdfParserApi
 
   PDFRequirementsFunction:
     Type: AWS::Serverless::Function
@@ -89,6 +90,7 @@ Resources:
           Properties:
             Path: /upload
             Method: get
+            RestApiId: !Ref PdfParserApi
 
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -148,3 +150,7 @@ Outputs:
   WebsiteBucketName:
     Description: "Generated Front-End S3 Bucket Name"
     Value: !Ref WebsiteBucket
+  PdfParserApiUrl:
+    Description: "PDF Parser API Gateway URL"
+    Value: 
+      !Sub "https://${PdfParserApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/"
