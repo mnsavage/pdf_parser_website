@@ -60,14 +60,14 @@ jobs:
         env:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
-    - name: Fetch API URL from Stack Outputs
-      id: fetch-url
-      run: |
-        API_URL=$(aws cloudformation describe-stacks --stack-name your-stack-name --query "Stacks[0].Outputs[?OutputKey=='PdfParserApiUrl'].OutputValue" --output text)
-        echo "API_URL=$API_URL" >> $GITHUB_ENV
+      - name: Fetch API URL from Stack Outputs
+        id: fetch-url
+        run: |
+          API_URL=$(aws cloudformation describe-stacks --stack-name your-stack-name --query "Stacks[0].Outputs[?OutputKey=='PdfParserApiUrl'].OutputValue" --output text)
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
 
-    - name: Create config.json and add it to build folder
-      run: echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/build/config.json
+      - name: Create config.json and add it to build folder
+        run: echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/build/config.json
 
       - name: Upload build folder to S3
         uses: jakejarvis/s3-sync-action@master
