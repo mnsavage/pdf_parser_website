@@ -63,8 +63,10 @@ jobs:
       - name: Fetch API URL from Stack Outputs
         id: fetch-url
         run: |
-          API_URL=$(aws cloudformation describe-stacks --stack-name your-stack-name --query "Stacks[0].Outputs[?OutputKey=='PdfParserApiUrl'].OutputValue" --output text)
+          API_URL=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='PdfParserApiUrl'].OutputValue" --output text)
           echo "API_URL=$API_URL" >> $GITHUB_ENV
+        env:
+          STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
       - name: Create config.json and add it to build folder
         run: echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/build/config.json
