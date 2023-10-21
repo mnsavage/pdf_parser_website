@@ -7,6 +7,10 @@ Resources:
     Type: 'AWS::Serverless::Api'
     Properties:
       StageName: Prod
+      Cors:
+        AllowOrigin: !Sub "'https://${CloudFrontDistribution.DomainName}'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowMethods: "'OPTIONS,GET,PUT,POST,DELETE'"
       BinaryMediaTypes:
         - 'application~1pdf'
       DefinitionBody:
@@ -14,7 +18,7 @@ Resources:
               info:
                 title: My API
               paths: # paths that the api has
-                /upload:
+                /api/upload:
                   get: # items GET protocol
                     x-amazon-apigateway-integration:
                       httpMethod: POST
@@ -29,6 +33,35 @@ Resources:
                       uri: # connect to lambda function resource
                         Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PDFUploadFunction.Arn}/invocations
                       responses: {}
+                  options:
+                    consumes:
+                      - "application/json"
+                    produces:
+                      - "application/json"
+                    responses:
+                      '200':
+                        description: "200 response"
+                        headers:
+                          Access-Control-Allow-Headers:
+                            type: "string"
+                          Access-Control-Allow-Methods:
+                            type: "string"
+                          Access-Control-Allow-Origin:
+                            type: "string"
+                    x-amazon-apigateway-integration:
+                      type: mock
+                      requestTemplates:
+                        application/json: '{"statusCode": 200}'
+                      responses:
+                        default:
+                          statusCode: "200"
+                          responseTemplates:
+                            application/json: '{}'
+                          responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                            method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE'"
+                            method.response.header.Access-Control-Allow-Origin: !Sub "'https://${CloudFrontDistribution.DomainName}'"
+                      passthroughBehavior: "when_no_match"
 
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
@@ -63,6 +96,9 @@ Resources:
   PDFUploadFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
       CodeUri: ./pdf_parser_back_end/api
       Handler: upload.post.handler
       Runtime: python3.9
@@ -72,13 +108,16 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /upload
+            Path: /api/upload
             Method: post
             RestApiId: !Ref PdfParserApi
 
   PDFRequirementsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: get.handler
       Runtime: python3.9
@@ -88,7 +127,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /upload
+            Path: /api/upload
             Method: get
             RestApiId: !Ref PdfParserApi
 
@@ -153,4 +192,4 @@ Outputs:
   PdfParserApiUrl:
     Description: "PDF Parser API Gateway URL"
     Value: 
-      !Sub "https://${PdfParserApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/"
+      !Sub "https://${PdfParserApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/"
