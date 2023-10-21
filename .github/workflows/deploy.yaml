@@ -69,7 +69,7 @@ jobs:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
       - name: Create config.json and add it to build folder
-        run: echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/build/config.json
+        run: echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/src/config.json
 
       - name: Upload build folder to S3
         uses: jakejarvis/s3-sync-action@master
