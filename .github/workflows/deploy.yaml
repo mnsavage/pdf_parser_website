@@ -90,10 +90,10 @@ jobs:
         env:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
-      - name: Delete AWS Stack on Pull Request
-        if: github.event_name == 'pull_request'
-        run: |
-          aws s3 rm s3://${{ env.FRONT_END_BUCKET_NAME }} --recursive
-          aws cloudformation delete-stack --stack-name $STACK_NAME
-        env:
-          STACK_NAME: pdf-parser-website-${{ github.run_id }}
+      # - name: Delete AWS Stack on Pull Request
+      #   if: github.event_name == 'pull_request'
+      #   run: |
+      #     aws s3 rm s3://${{ env.FRONT_END_BUCKET_NAME }} --recursive
+      #     aws cloudformation delete-stack --stack-name $STACK_NAME
+      #   env:
+      #     STACK_NAME: pdf-parser-website-${{ github.run_id }}
