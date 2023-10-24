@@ -93,14 +93,25 @@ Resources:
             - logs:PutLogEvents
           Resource: 'arn:aws:logs:*:*:*'
 
+  UtilitiesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: utilities
+      Description: My shared layer for utilities
+      ContentUri: ./pdf_parser_back_end/api/utilities
+      CompatibleRuntimes:
+        - python3.9
+
   PDFUploadFunction:
     Type: AWS::Serverless::Function
     Properties:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-      CodeUri: ./pdf_parser_back_end/api
-      Handler: upload.post.handler
+      CodeUri: ./pdf_parser_back_end/api/upload
+      Handler: post.handler
+      Layers:
+        - !Ref UtilitiesLayer
       Runtime: python3.9
       Timeout: 300
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -120,6 +131,8 @@ Resources:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: get.handler
+      Layers:
+        - !Ref UtilitiesLayer
       Runtime: python3.9
       Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
