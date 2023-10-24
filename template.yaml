@@ -98,7 +98,7 @@ Resources:
     Properties:
       LayerName: utilities
       Description: My shared layer for utilities
-      ContentUri: ./pdf_parser_back_end/api/upload
+      ContentUri: ./pdf_parser_back_end/api/utilities
       CompatibleRuntimes:
         - python3.9
 
