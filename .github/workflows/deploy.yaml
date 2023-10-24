@@ -69,9 +69,10 @@ jobs:
           STACK_NAME: pdf-parser-website-${{ github.run_id }}
 
       - name: Update config JSON file(API url)
-        run: | 
-            rm pdf_parser_front_end/src/config.json
-            echo "{\"apiURL\":\"$API_URL\"}" > pdf_parser_front_end/src/config.json
+        run: |
+          sudo apt-get install jq
+          jq --arg API_URL "$API_URL" '.apiURL = $API_URL' pdf_parser_front_end/src/config.json > temp.json
+          mv temp.json pdf_parser_front_end/src/config.json
 
       - name: Upload build folder to S3
         uses: jakejarvis/s3-sync-action@master
