@@ -16,11 +16,10 @@ jobs:
         with:
           submodules: true
 
-      - name: Install dependencies and build React app
+      - name: Install react dependencies 
         run: |
           cd pdf_parser_front_end/
           npm ci
-          npm run build
           
       - name: Setup AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
@@ -75,6 +74,11 @@ jobs:
           jq --arg API_URL "$API_URL" '.apiURL = $API_URL' pdf_parser_front_end/src/config.json > temp.json
           mv temp.json pdf_parser_front_end/src/config.json
           cat pdf_parser_front_end/src/config.json
+      
+      - name: Build react project
+        run: |
+          cd pdf_parser_front_end/
+          npm run build
 
       - name: Upload build folder to S3
         uses: jakejarvis/s3-sync-action@master
