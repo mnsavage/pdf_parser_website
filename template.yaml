@@ -108,7 +108,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /api
+            Path: /api/upload
             Method: post
             RestApiId: !Ref PdfParserApi
 
@@ -118,7 +118,7 @@ Resources:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-      CodeUri: ./pdf_parser_back_end/api/upload
+      CodeUri: ./pdf_parser_back_end/api
       Handler: get.handler
       Runtime: python3.9
       Timeout: 60
@@ -127,7 +127,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /api
+            Path: /api/upload
             Method: get
             RestApiId: !Ref PdfParserApi
 
