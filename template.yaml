@@ -99,8 +99,8 @@ Resources:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-      CodeUri: ./pdf_parser_back_end
-      Handler: api.upload.post.handler
+      CodeUri: ./pdf_parser_back_end/api
+      Handler: upload.post.handler
       Runtime: python3.9
       Timeout: 300
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -118,8 +118,8 @@ Resources:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-      CodeUri: ./pdf_parser_back_end
-      Handler: api.upload.get.handler
+      CodeUri: ./pdf_parser_back_end/api
+      Handler: upload.get.handler
       Runtime: python3.9
       Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
