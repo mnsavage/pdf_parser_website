@@ -108,7 +108,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /api/upload
+            Path: /api
             Method: post
             RestApiId: !Ref PdfParserApi
 
@@ -127,7 +127,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /api/upload
+            Path: /api
             Method: get
             RestApiId: !Ref PdfParserApi
 
