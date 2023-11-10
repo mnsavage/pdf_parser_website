@@ -18,14 +18,15 @@ Resources:
               info:
                 title: My API
               paths: # paths that the api has
-                /api/upload:
+                /api/upload{uuid}:
                   get: # items GET protocol
                     x-amazon-apigateway-integration:
                       httpMethod: POST
                       type: aws_proxy
                       uri: # connect to lambda function resource
-                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PDFRequirementsFunction.Arn}/invocations
+                        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUpload.Arn}/invocations
                       responses: {}
+                /api/upload:
                   post: # items POST protocol
                     x-amazon-apigateway-integration:
                       httpMethod: POST
@@ -63,36 +64,6 @@ Resources:
                             method.response.header.Access-Control-Allow-Origin: !Sub "'https://${CloudFrontDistribution.DomainName}'"
                       passthroughBehavior: "when_no_match"
 
-  LambdaExecutionRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      RoleName: 'YourLambdaRoleName'
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: 
-              - 'lambda.amazonaws.com'
-          Action:
-            - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - !Ref CloudWatchLogsPolicy
-
-  CloudWatchLogsPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties:
-      Description: 'Managed Policy for CloudWatch Logs Access'
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Action:
-            - logs:CreateLogGroup
-            - logs:CreateLogStream
-            - logs:PutLogEvents
-          Resource: 'arn:aws:logs:*:*:*'
-
   UtilitiesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -107,7 +78,8 @@ Resources:
     Properties:
       Environment:
         Variables:
-          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          - CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          - STORAGE: !Ref UploadDynamoDBTable
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: post.handler
       Layers:
@@ -123,12 +95,13 @@ Resources:
             Method: post
             RestApiId: !Ref PdfParserApi
 
-  PDFRequirementsFunction:
+  GetUpload:
     Type: AWS::Serverless::Function
     Properties:
       Environment:
         Variables:
-          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          - CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          - STORAGE: !Ref UploadDynamoDBTable
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: get.handler
       Layers:
@@ -140,7 +113,7 @@ Resources:
         Upload:
           Type: Api
           Properties:
-            Path: /api/upload
+            Path: /api/upload/{uuid}
             Method: get
             RestApiId: !Ref PdfParserApi
 
@@ -169,6 +142,59 @@ Resources:
             Principal: '*'
             Action: 's3:GetObject'
             Resource: !Sub arn:aws:s3:::${WebsiteBucket}/*
+
+  UploadDynamoDBTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      TableName: uploads
+      PrimaryKey:
+        Name: uuid
+        Type: String
+
+  DynamoDBPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: 'Managed Policy for DynamoDB PutItem'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource: '*'
+
+  CloudWatchLogsPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: 'Managed Policy for CloudWatch Logs Access'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: 'arn:aws:logs:*:*:*'
+
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: 'YourLambdaRoleName'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+              - 'lambda.amazonaws.com'
+          Action:
+            - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref CloudWatchLogsPolicy
+        - !Ref DynamoDBPolicy
 
   OriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
