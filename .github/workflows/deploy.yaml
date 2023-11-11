@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./pdf_parser_back_end/api/pdf_parser/dockerfile
+          file: ./pdf_parser/dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pdf_parser:latest
 
