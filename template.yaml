@@ -88,6 +88,8 @@ Resources:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
           STORAGE: !Ref UploadDynamoDBTable
+          JOB_QUEUE: !Ref MyJobQueue
+          JOB_DEFINITION: !Ref MyJobDefinition
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: post.handler
       Layers:
