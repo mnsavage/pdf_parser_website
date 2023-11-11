@@ -42,10 +42,10 @@ jobs:
           push: true
           tags: docker_username/pdf_parser:latest
 
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.9
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
       - name: Deploy with SAM
         run: |
