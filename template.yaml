@@ -86,8 +86,8 @@ Resources:
     Properties:
       Environment:
         Variables:
-          - CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-          - STORAGE: !Ref UploadDynamoDBTable
+          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          STORAGE: !Ref UploadDynamoDBTable
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: post.handler
       Layers:
@@ -108,8 +108,8 @@ Resources:
     Properties:
       Environment:
         Variables:
-          - CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-          - STORAGE: !Ref UploadDynamoDBTable
+          CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
+          STORAGE: !Ref UploadDynamoDBTable
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: get.handler
       Layers:
