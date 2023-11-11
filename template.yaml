@@ -311,8 +311,8 @@ Resources:
             Action: 
               - "batch:SubmitJob"
             Resource: 
-              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/MyJobDefinition:*"
-              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-queue/MyJobQueue"
+              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/${MyJobDefinition.Name}:*"
+              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-queue/${MyJobQueue.Name}"
 
 Outputs:
   WebsiteURL:
