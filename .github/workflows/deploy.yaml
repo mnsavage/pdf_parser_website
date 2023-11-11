@@ -37,7 +37,7 @@ jobs:
       - name: List contents of a directory
         run: |
           echo "Listing contents of the directory"
-          ls -l ./pdf_parser_back_end/api/pdf_parser/
+          ls -l pdf_parser_back_end/
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
