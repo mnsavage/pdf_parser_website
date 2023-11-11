@@ -268,7 +268,7 @@ Resources:
         MaxvCpus: 16
         DesiredvCpus: 0
         InstanceTypes:
-          - t2.micro
+          - optimal
         Subnets:
           - !Ref SubnetParameter
         SecurityGroupIds:
