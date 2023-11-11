@@ -66,9 +66,9 @@ jobs:
             --resolve-s3 \
             --no-fail-on-empty-changeset \
             --parameter-overrides \
-            DockerImageUri=docker.io/docker_username/pdf_parser:latest \
             SubnetParameter=${{ secrets.SUBNET_ID }} \
-            SecurityGroupParameter=${{ secrets.SECURITY_GROUP_ID }}
+            SecurityGroupParameter=${{ secrets.SECURITY_GROUP_ID }} \
+            DockerImageUri=docker.io/docker_username/pdf_parser:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
