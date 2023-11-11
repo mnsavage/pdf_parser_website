@@ -307,12 +307,16 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Effect: "Allow"
-            Action: 
-              - "batch:SubmitJob"
-            Resource: 
-              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/MyJobDefinition/*"
-              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-queue/MyJobQueue/*"
+          - Effect: Allow
+            Action:
+              - batch:SubmitJob
+              - batch:Describe*
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ec2:Describe*
+              - ecs:Describe*
+              - ecs:List*
+            Resource: "*"
 
 Outputs:
   WebsiteURL:
