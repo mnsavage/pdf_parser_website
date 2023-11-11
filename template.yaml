@@ -260,6 +260,25 @@ Resources:
                   - logs:PutLogEvents
                 Resource: '*'
 
+  ECSInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+  ECSInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref ECSInstanceRole
+
   MyComputeEnvironment:
     Type: AWS::Batch::ComputeEnvironment
     Properties:
@@ -276,7 +295,7 @@ Resources:
           - !Ref SubnetParameter
         SecurityGroupIds:
           - !Ref SecurityGroupParameter
-        InstanceRole: ecsInstanceRole
+        InstanceRole: !Ref ECSInstanceProfile
 
   MyJobQueue:
     Type: AWS::Batch::JobQueue
