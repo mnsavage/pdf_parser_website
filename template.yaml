@@ -319,6 +319,9 @@ Resources:
         Command:
           - python
           - main.py
+        Environment:
+          - Name: AWS_REGION
+            Value: us-east-1
         JobRoleArn: !GetAtt MyBatchRole.Arn
 
   BatchSubmitJobPolicy:
