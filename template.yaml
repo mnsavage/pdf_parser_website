@@ -2,6 +2,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: An example SAM template for hosting a React website on S3 with CloudFront.
 
+Parameters:
+  SubnetParameter:
+    Type: String
+  SecurityGroupParameter:
+    Type: String
+  DockerImageParameter:
+    Type: String
+
 Resources:
   PdfParserApi:
     Type: 'AWS::Serverless::Api'
@@ -220,6 +228,74 @@ Resources:
             QueryString: 'false'
             Cookies:
               Forward: none
+
+  MyBatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: batch.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BatchJobPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:UpdateItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                Resource: !GetAtt UploadDynamoDBTable.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  MyComputeEnvironment:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      Type: MANAGED
+      ComputeEnvironmentName: MyComputeEnvironment
+      ComputeResources:
+        Type: EC2
+        MinvCpus: 0
+        MaxvCpus: 16
+        DesiredvCpus: 0
+        InstanceTypes:
+          - t2.micro
+        Subnets:
+          - !Ref SubnetParameter
+        SecurityGroupIds:
+          - !Ref SecurityGroupParameter
+        InstanceRole: ecsInstanceRole
+
+  MyJobQueue:
+    Type: AWS::Batch::JobQueue
+    Properties:
+      ComputeEnvironmentOrder:
+        - Order: 1
+          ComputeEnvironment: !Ref MyComputeEnvironment
+      Priority: 1
+
+  MyJobDefinition:
+    Type: AWS::Batch::JobDefinition
+    Properties:
+      Type: container
+      JobDefinitionName: MyJobDefinition
+      ContainerProperties:
+        Image: !Ref DockerImageParameter
+        Vcpus: 1
+        Memory: 512
+        Command:
+          - python
+          - main.py
+        JobRoleArn: !GetAtt MyBatchRole.Arn
 
 Outputs:
   WebsiteURL:
