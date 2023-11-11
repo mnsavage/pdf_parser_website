@@ -26,7 +26,7 @@ Resources:
               info:
                 title: My API
               paths: # paths that the api has
-                /api/upload{uuid}:
+                /api/upload/{uuid}:
                   get: # items GET protocol
                     x-amazon-apigateway-integration:
                       httpMethod: POST
