@@ -40,7 +40,7 @@ jobs:
           context: .
           file: ./pdf_parser_back_end/api/pdf_parser
           push: true
-          tags: docker_username/pdf_parser:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pdf_parser:latest
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
