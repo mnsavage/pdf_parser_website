@@ -205,6 +205,7 @@ Resources:
       ManagedPolicyArns:
         - !Ref CloudWatchLogsPolicy
         - !Ref DynamoDBPolicy
+        - !Ref BatchSubmitJobPolicy
 
   OriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -298,6 +299,20 @@ Resources:
           - python
           - main.py
         JobRoleArn: !GetAtt MyBatchRole.Arn
+
+  BatchSubmitJobPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Policy to allow submitting jobs to AWS Batch"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: 
+              - "batch:SubmitJob"
+            Resource: 
+              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-definition/MyJobDefinition:*"
+              - !Sub "arn:aws:batch:${AWS::Region}:${AWS::AccountId}:job-queue/MyJobQueue"
 
 Outputs:
   WebsiteURL:
