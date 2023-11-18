@@ -1,7 +1,10 @@
 # pdf-parser-website
 
-## website aws services architecture
+## website aws services architecture:
 ![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/54f179c1-6d89-48af-9694-e8d2f7cdefbd)
+
+## github repository architecture:
+![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/804d2f89-7837-42d0-87e4-a2cd0ba37b50)
 
 
 ## documentation on tools and services used in this repo:
@@ -22,7 +25,7 @@
 - `sam delete`: delete the stack you have deploy in AWS console
 
 ## set up github action secrets to deploying website with github action:
-- got to the `setting` tab of the `pdf_parser_website`
+- go to the `setting` tab of the `pdf_parser_website`
 - navigate to `secrets and variables` and click `Actions`
 - add `AWS_ACCESS_KEY_ID` secret: can get from aws console
 - add `AWS_SECRET_ACCESS_KEY` secret: can get from aws console
