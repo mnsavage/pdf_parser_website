@@ -87,7 +87,8 @@ Resources:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-          STORAGE: !Ref UploadDynamoDBTable
+          DYNAMODB: !Ref UploadDynamoDBTable
+          S3: !Ref EncodedPDFsBucket
           JOB_QUEUE: !Ref MyJobQueue
           JOB_DEFINITION: !Ref MyJobDefinition
       CodeUri: ./pdf_parser_back_end/api/upload
@@ -111,7 +112,7 @@ Resources:
       Environment:
         Variables:
           CLOUDFRONT_URL: !Sub "https://${CloudFrontDistribution.DomainName}"
-          STORAGE: !Ref UploadDynamoDBTable
+          DYNAMODB: !Ref UploadDynamoDBTable
       CodeUri: ./pdf_parser_back_end/api/upload
       Handler: get.handler
       Layers:
@@ -152,6 +153,23 @@ Resources:
             Principal: '*'
             Action: 's3:GetObject'
             Resource: !Sub arn:aws:s3:::${WebsiteBucket}/*
+
+  EncodedPDFsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-encoded-pdfs-bucket
+
+  EncodedPDFsBucketPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: "Policy to allow Lambda to PutObject in S3 bucket"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${EncodedPDFsBucket}/*"
 
   UploadDynamoDBTable:
     Type: 'AWS::Serverless::SimpleTable'
@@ -207,6 +225,7 @@ Resources:
         - !Ref CloudWatchLogsPolicy
         - !Ref DynamoDBPolicy
         - !Ref BatchSubmitJobPolicy
+        - !Ref EncodedPDFsBucketPolicy
 
   OriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -262,6 +281,12 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: 
+                  - !Sub 'arn:aws:s3:::${EncodedPDFsBucket}/*'
+                  - !Sub 'arn:aws:s3:::${EncodedPDFsBucket}'
 
   ECSInstanceRole:
     Type: AWS::IAM::Role
@@ -323,6 +348,8 @@ Resources:
         Environment:
           - Name: AWS_REGION
             Value: us-east-1
+          - Name: S3_NAME
+            Value: !Ref EncodedPDFsBucket
         JobRoleArn: !GetAtt MyBatchRole.Arn
 
   BatchSubmitJobPolicy:
