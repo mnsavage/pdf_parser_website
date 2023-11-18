@@ -1,7 +1,8 @@
 # pdf-parser-website
 
 ## website aws services architecture
-![Alt text](images/aws services architecture.png)
+![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/54f179c1-6d89-48af-9694-e8d2f7cdefbd)
+
 
 ## documentation on tools and services used in this repo:
 ### sam
