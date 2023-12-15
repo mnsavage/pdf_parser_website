@@ -48,4 +48,5 @@
 # Notes to next group working on this project:
 - At present, the back-end experiences slowness during the execution of batch jobs for PDF validation. To address this, consider not storing the Docker image on Docker Hub, but instead using AWS ECR for storage. Once this adjustment is made, the front-end can be configured to make GET protocol requests every 5 seconds, rather than at 30-second intervals.
 - Please be aware that deploying multiple stacks to AWS is not feasible with this setup, as some of the resources created in AWS do not have unique names, leading to potential conflicts.
+- Testing changes that span across multiple repositories is currently challenging, as it requires building the stack each time to verify new modifications. A potential solution to streamline this process is the implementation of higher-level testing methods, such as integration tests. These can provide a more efficient way to validate the functionality of new changes without the need for frequent stack builds.
 
