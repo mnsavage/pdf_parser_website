@@ -4,6 +4,10 @@
 - In this repository, each time a pull request (PR) is submitted, a GitHub Action is activated. This Action is responsible for building the stack on AWS and then deleting it afterward. This process serves as a verification method to ensure that new changes still permit the stack to be successfully built.
 - This repository features a GitHub Action workflow that can be manually triggered to automatically deploy the website by building it in AWS. It's important to note that the stack in AWS must be manually deleted after deployment when using this workflow.
 
+## resources on how to update pdf_parser_website with new changes from submodules:
+- https://phoenixnap.com/kb/git-pull-submodule
+- https://git-scm.com/book/en/v2/Git-Tools-Submodules
+
 ## website aws services architecture:
 ![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/54f179c1-6d89-48af-9694-e8d2f7cdefbd)
 
