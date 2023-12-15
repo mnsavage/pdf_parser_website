@@ -1,5 +1,9 @@
 # pdf-parser-website
 
+## github actions:
+- In this repository, each time a pull request (PR) is submitted, a GitHub Action is activated. This Action is responsible for building the stack on AWS and then deleting it afterward. This process serves as a verification method to ensure that new changes still permit the stack to be successfully built.
+- This repository features a GitHub Action workflow that can be manually triggered to automatically deploy the website by building it in AWS. It's important to note that the stack in AWS must be manually deleted after deployment when using this workflow.
+
 ## website aws services architecture:
 ![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/54f179c1-6d89-48af-9694-e8d2f7cdefbd)
 
@@ -43,4 +47,5 @@
 
 # Notes to next group working on this project:
 - At present, the back-end experiences slowness during the execution of batch jobs for PDF validation. To address this, consider not storing the Docker image on Docker Hub, but instead using AWS ECR for storage. Once this adjustment is made, the front-end can be configured to make GET protocol requests every 5 seconds, rather than at 30-second intervals.
+- Please be aware that deploying multiple stacks to AWS is not feasible with this setup, as some of the resources created in AWS do not have unique names, leading to potential conflicts.
 
