@@ -41,3 +41,6 @@
 - click on `Run work flow` button
 ![image](https://github.com/mnsavage/pdf_parser_website/assets/60998598/b45c82a3-f584-49c9-8298-012ea0e47fe6)
 
+# Notes to next group working on this project:
+- At present, the back-end experiences slowness during the execution of batch jobs for PDF validation. To address this, consider not storing the Docker image on Docker Hub, but instead using AWS ECR for storage. Once this adjustment is made, the front-end can be configured to make GET protocol requests every 5 seconds, rather than at 30-second intervals.
+
